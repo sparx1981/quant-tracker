@@ -21,6 +21,7 @@ Open http://127.0.0.1:3000. Verify with `npm test` and `npm run build`.
 - Bear/base/bull statistical scenarios for 7, 30, 90, 180 and 365 days.
 - Live balances for three explicitly labelled exchange wallets, and recent large-transfer filtering.
 - Official Quant announcements and third-party QNT news, with dates and source links.
+- A server-side Check feeds panel that verifies provider responses, latency, optional credentials and partial-data risks without exposing secrets.
 - Responsive layout, keyboard-accessible controls, reduced-motion support and honest unavailable states.
 
 ## Data and limitations
@@ -36,6 +37,8 @@ Open http://127.0.0.1:3000. Verify with `npm test` and `npm run build`.
 | Official news and media headlines | Quant RSS and Google News RSS | 10 minutes |
 
 Browser polling runs only while visible. Vercel CDN and short process-local source caches reduce load; process-local last-known-good data is not durable across cold starts. No unattended indexing, historical transfer archive or push alerts are implemented. Public sources may rate-limit, block a region, change their schema, or stop offering keyless access. Failed source calls are labelled unavailable or stale; they never generate sample values.
+
+The Check feeds panel runs an on-demand, uncached health check across the active market, candle, FX, Ethereum, news and storage endpoints. It reports healthy, review, failed, not configured and configured-but-unused states. It does not display credentials. CryptoQuant is shown as configured but unused because the current dashboard does not call its plan-specific on-chain endpoints; Supabase is checked for connectivity but is not yet used for persistence.
 
 QNT contract: `0x4a220E6096B25EADb88358cb44068A3248254675`.
 
@@ -58,6 +61,10 @@ Use Vercel Authentication deployment protection for personal access. A preview d
 
 No environment variables are required. Source files are the deployable artifact; build output and Vercel account metadata are ignored by Git.
 
+## Optional provider configuration
+
+The dashboard works with keyless public sources. For more reliable Ethereum reads, copy `.env.example` to a local environment file or add the same names as server-only Vercel environment variables: `ALCHEMY_ETHEREUM_URL`, `INFURA_ETHEREUM_URL` and optionally `BLOCKSCOUT_API_URL`. Optional `COINGECKO_API_KEY` and `COINMARKETCAP_API_KEY` values add authenticated market-data fallbacks; `ETHERSCAN_API_KEY` is reserved for address-label cross-checks, and `CRYPTOQUANT_API_KEY` is reserved for plans that include ERC-20 on-chain data. The RPC and API keys are used only by server routes and are never exposed to the browser. Supabase variables are reserved for future durable transfer, forecast and calibration storage; a Supabase URL by itself is not sufficient because a server-side secret key is also required. Prefer `SUPABASE_SECRET_KEY` for new Supabase projects; `SUPABASE_SERVICE_ROLE_KEY` is only the legacy fallback. Rotate any credential that has been pasted into a chat or committed file before using it.
+
 ## September dashboard update
 
 Price quotes now use Coinbase QNT/USD, polled every 15 seconds while the page is visible (10-second source/CDN cache), with the aggregate market price as fallback. Supply/scenarios refresh every minute. GBP uses the daily reference FX rate, so it is not a live foreign-exchange quote.
@@ -70,7 +77,7 @@ The backtest lab compares buy-and-hold, SMA 20/50, EMA 12/26, MACD, RSI mean rev
 
 Transfers refresh every minute and scan up to ten pages (500 events), stopping at 24 hours or the request time budget. This remains a bounded sample, not complete coverage. Large/all-transfer controls and scan coverage explain empty filtered results. Exchange balances have a Blockscout v2 fallback when the legacy endpoint is rate-limited.
 
-Official announcements come directly from Quant RSS. Six selected X accounts are linked in a watchlist; their posts are not automatically ingested without X API access. Follower counts are not used as a reliability score.
+Official announcements come directly from Quant RSS. Twelve selected X accounts are linked in a watchlist; their posts are not automatically ingested without X API access. Follower counts are not used as a reliability score.
 
 The logo uses Quant's official artwork, tinted through a CSS mask: https://quant.network/assets/uploads/2025/08/Quant-logo_300x200.png .
 

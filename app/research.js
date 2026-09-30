@@ -56,5 +56,6 @@ export function Backtests({ feed, cash, spot }) {
 }
 
 export function SocialWatchlist() {
-  return <div className="social-watchlist"><div><h3>X account watchlist</h3><p className="small muted">Direct links only. X posts are not automatically ingested. Company announcements below come directly from quant.network; media headlines come from Google News.</p></div><div className="social-links">{['Legitcryptonerd','SanNL11','MindCrypto_','coinbureau','IOV_OWL','quantnetwork'].map(account=><a key={account} href={`https://x.com/${account}`} target="_blank" rel="noopener noreferrer">@{account}<ExternalLink size={12}/></a>)}</div></div>;
+  const accounts = ['Legitcryptonerd', 'SanNL11', 'MindCrypto_', 'coinbureau', 'IOV_OWL', 'quantnetwork', 'TheMilesBron', 'JanGold_', 'gverdian', 'OverledgerDev', 'FusionLayer25', 'GregLuntX'];
+  return <div className="social-watchlist"><div><h3>X account watchlist</h3><p className="small muted">Direct links only. X posts are not automatically ingested. Company announcements below come directly from quant.network; media headlines come from Google News.</p></div><div className="social-links">{accounts.map(account=><a key={account} href={`https://x.com/${account}`} target="_blank" rel="noopener noreferrer">@{account}<ExternalLink size={12}/></a>)}</div></div>;
 }
