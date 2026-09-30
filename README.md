@@ -15,6 +15,10 @@ Open http://127.0.0.1:3000. Verify with `npm test` and `npm run build`.
 
 ## Features
 
+- Separate Overview (`/`), Research (`/research`) and Data Health (`/data-health`) views.
+- Drawdown duration in the strategy lab: longest/current time below previous equity peak, including the starting balance. Daily bars are reported as days.
+- Expandable source mapping distinguishes inputs, retrieval times and provider timestamps.
+
 - USD and GBP prices and supply metrics, with provider attribution and retrieval times.
 - Browser-local holdings calculator and currency preference. Holdings never leave the browser.
 - Multiple QNT/USDT chart timeframes, 11 explained indicators and bullish/neutral/bearish filtering.
@@ -62,6 +66,12 @@ Use Vercel Authentication deployment protection for personal access. A preview d
 No environment variables are required. Source files are the deployable artifact; build output and Vercel account metadata are ignored by Git.
 
 ## Optional provider configuration
+
+### Public forecast archive setup
+
+Run `supabase/schema.sql` once in your Supabase project's SQL Editor, then set `SUPABASE_URL` and `SUPABASE_SECRET_KEY` in Vercel and redeploy. A legacy service-role JWT is also supported. The table has RLS enabled with no anonymous or authenticated-user access; only the server credential records snapshots.
+
+The market route attempts to save the first fresh public market forecast per UTC day and model version. Existing records are not overwritten. It stores public prices, source times and model outputs only, never holdings, cost basis or personal targets. Recording is driven by dashboard requests, not an unattended scheduled job; days without use can be absent. Data Health reports recording failures separately from connectivity. Forecast outcome calibration is not yet implemented. The browser journal uses deadline-specific historical closes and leaves missing outcomes unscored.
 
 The dashboard works with keyless public sources. For more reliable Ethereum reads, copy `.env.example` to a local environment file or add the same names as server-only Vercel environment variables: `ALCHEMY_ETHEREUM_URL`, `INFURA_ETHEREUM_URL` and optionally `BLOCKSCOUT_API_URL`. Optional `COINGECKO_API_KEY` and `COINMARKETCAP_API_KEY` values add authenticated market-data fallbacks; `ETHERSCAN_API_KEY` is reserved for address-label cross-checks, and `CRYPTOQUANT_API_KEY` is reserved for plans that include ERC-20 on-chain data. The RPC and API keys are used only by server routes and are never exposed to the browser. Supabase variables are reserved for future durable transfer, forecast and calibration storage; a Supabase URL by itself is not sufficient because a server-side secret key is also required. Prefer `SUPABASE_SECRET_KEY` for new Supabase projects; `SUPABASE_SERVICE_ROLE_KEY` is only the legacy fallback. Rotate any credential that has been pasted into a chat or committed file before using it.
 

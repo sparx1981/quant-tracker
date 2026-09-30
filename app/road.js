@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
+import { journalOutcome } from '../lib/risk';
 import { road, protectionComparison } from '../lib/road';
 const number = n => Number.isFinite(n) ? n.toLocaleString('en-GB',{maximumFractionDigits:1}) : '—';
 const date = t => new Date(t).toLocaleDateString('en-GB',{month:'short',year:'numeric',timeZone:'UTC'});
@@ -47,7 +48,7 @@ export default function RoadToTarget({candles=[],spot,cash,quantity,stale}) {
   </section>;
 }
 
-export function SignalJournal({ stance, price, target = 1000 }) {
+export function SignalJournal({ stance, price, candles = [], target = 1000 }) {
   const [entries, setEntries] = useState([]);
   useEffect(() => {
     try { setEntries(JSON.parse(localStorage.getItem('qnt-signal-journal') || '[]')); } catch { setEntries([]); }
@@ -62,7 +63,7 @@ export function SignalJournal({ stance, price, target = 1000 }) {
       return next;
     });
   }, [stance, price, target]);
-  const matured = entries.filter(e => Date.now() >= e.created + e.horizonDays * 86400000 && Number.isFinite(e.price));
-  const successful = matured.filter(e => e.stance === 'Bullish' ? price > e.price : e.stance === 'Bearish' ? price < e.price : Math.abs(price / e.price - 1) < .05);
-  return <section className="panel signal-journal"><div className="section-title"><div><span className="eyebrow">MEASURE THE EDGE</span><h3>Signal journal</h3></div><span className="badge neutral">Browser-only</span></div><p className="section-description">Momentum readings are saved when they change materially. After 30 days, the dashboard compares the outcome with the original direction.</p><div className="journal-stats"><span><strong>{entries.length}</strong> logged</span><span><strong>{matured.length}</strong> matured</span><span><strong>{matured.length ? `${(successful.length / matured.length * 100).toFixed(0)}%` : '—'}</strong> directional hit rate</span></div><div className="table-scroll"><table className="backtest-table"><thead><tr><th>Signal</th><th>Price</th><th>Recorded</th><th>Outcome</th></tr></thead><tbody>{entries.slice(0, 8).map(e => { const done = Date.now() >= e.created + e.horizonDays * 86400000; const good = done && (e.stance === 'Bullish' ? price > e.price : e.stance === 'Bearish' ? price < e.price : Math.abs(price / e.price - 1) < .05); return <tr key={`${e.key}-${e.created}`}><th>{e.stance}</th><td>{e.price.toFixed(2)}</td><td>{new Date(e.created).toLocaleDateString('en-GB')}</td><td>{done ? good ? 'Aligned' : 'Not aligned' : 'Waiting'}</td></tr>; })}</tbody></table></div><p className="small muted">This is an observational audit, not a retrained model. It needs enough matured observations before the hit rate means anything.</p></section>;
+  const matured = entries.filter(e => journalOutcome(e, candles));
+  const successful = matured.filter(e => journalOutcome(e, candles)?.aligned);
+  return <section className="panel signal-journal"><div className="section-title"><div><span className="eyebrow">MEASURE THE EDGE</span><h3>Signal journal</h3></div><span className="badge neutral">Browser-only</span></div><p className="section-description">Momentum readings are saved when they change materially. Outcomes use the first completed daily close on or after the 30-day deadline. Missing history stays unscored. USD entries are compared with Binance USDT closes, assuming parity.</p><div className="journal-stats"><span><strong>{entries.length}</strong> logged</span><span><strong>{matured.length}</strong> matured</span><span><strong>{matured.length ? `${(successful.length / matured.length * 100).toFixed(0)}%` : '—'}</strong> directional hit rate</span></div><div className="table-scroll"><table className="backtest-table"><thead><tr><th>Signal</th><th>Price</th><th>Recorded</th><th>Outcome</th></tr></thead><tbody>{entries.slice(0, 8).map(e => { const outcome = journalOutcome(e, candles); const done = Boolean(outcome); const good = outcome?.aligned; return <tr key={`${e.key}-${e.created}`}><th>{e.stance}</th><td>{e.price.toFixed(2)}</td><td>{new Date(e.created).toLocaleDateString('en-GB')}</td><td>{done ? good ? 'Aligned' : 'Not aligned' : 'Waiting'}</td></tr>; })}</tbody></table></div><p className="small muted">This is an observational audit, not a retrained model. It needs enough matured observations before the hit rate means anything.</p></section>;
 }
