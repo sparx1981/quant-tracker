@@ -1,0 +1,60 @@
+'use client';
+import { useState } from 'react';
+import { Activity, ChevronDown, CircleHelp, ExternalLink } from 'lucide-react';
+
+const fmt = (n, digits = 1) => Number.isFinite(n) ? n.toLocaleString('en-GB', { maximumFractionDigits: digits }) : '—';
+const date = t => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const pct = p => p == null ? 'Unavailable' : p > 0 && p < .001 ? '<0.1%' : p < 1 && p > .999 ? '>99.9%' : `${fmt(p * 100)}%`;
+const Badge = ({ signal }) => <span className={`badge ${signal.toLowerCase()}`}>{signal}</span>;
+
+export function Momentum({ feed, timeframe, setTimeframe, refresh }) {
+  const [filter, setFilter] = useState('All');
+  const a = feed.data?.data?.analysis;
+  const items = (a?.indicators || []).filter(i => filter === 'All' || i.signal === filter);
+  return <section className="panel momentum-panel">
+    <div className="section-title"><div><span className="eyebrow">READ THE MARKET</span><h2>Technical momentum</h2></div><Badge signal={a?.stance || 'Loading'}/></div>
+    <div className="timeframe-tabs segmented" aria-label="Momentum timeframe">{[['1h','1hr'],['4h','4hr'],['1d','Daily'],['1w','Weekly'],['1M','Monthly']].map(([value,label]) => <button key={value} aria-pressed={timeframe === value} onClick={() => {setTimeframe(value);setFilter('All');}}>{label}</button>)}</div>
+    {a?.available ? <><div className="momentum-summary"><div className="momentum-score"><strong>{a.counts.Bullish}</strong><span>/ {a.available}<small>bullish signals</small></span></div><div className="signal-breakdown"><div className="signal-bar">{['Bullish','Neutral','Bearish'].map(s => <span key={s} className={s.toLowerCase()} style={{width:`${a.counts[s]/a.available*100}%`}}/>)}</div><div className="signal-legend">{['Bullish','Neutral','Bearish'].map(s => <span key={s}><i className={`legend-dot ${s.toLowerCase()}`}/>{a.counts[s]} {s}</span>)}</div></div></div><p className="section-description">{a.bars} completed {timeframe} candles. {a.counts.Unavailable > 0 && `${a.counts.Unavailable} indicator excluded because history is too short.`} Click a reading to see its rule.</p></> : <p className="section-description">{feed.loading ? 'Loading the selected timeframe…' : a?.reason || 'Trading history is unavailable.'}</p>}
+    {(feed.error || feed.data?.status === 'stale') && <p className="warning-text small">History is stale. <button className="text-button" onClick={refresh}>Retry</button></p>}
+    <div className="filter-row">{['All','Bullish','Bearish','Neutral'].map(s => <button key={s} aria-pressed={filter===s} onClick={()=>setFilter(s)}>{s}</button>)}</div>
+    <div className="indicator-list">{items.map(i => <details className="indicator" key={i.name}><summary><span><strong>{i.name}</strong><small>{i.category}</small></span><span className="indicator-reading">{i.value}</span><Badge signal={i.signal}/><ChevronDown size={14}/></summary><p>{i.explanation}</p></details>)}{!items.length && <div className="empty"><p>{feed.loading ? 'Loading indicators…' : 'No indicators in this view.'}</p></div>}</div>
+    <div className="panel-foot"><span>Binance · QNT/USDT</span><span>{a?.asOf ? `Closed ${new Date(a.asOf).toISOString().replace('T',' ').slice(0,16)} UTC` : 'Awaiting data'}</span></div>
+    <p className="small muted research-footnote">Periods mean candles: SMA 20 uses 20 hours on 1hr, 20 weeks on Weekly. Unfinished candles are excluded.</p>
+  </section>;
+}
+
+export function Scenarios({ forecasts, cash, currency, other, anchorPrice, anchorTime, stale }) {
+  return <section className="panel forecasts-panel"><div className="section-title"><div><span className="eyebrow">LOOKING AHEAD</span><h2>Price scenarios</h2></div><Activity size={18}/></div>
+    <p className="section-description">Estimated chance of touching each target at any time before its deadline, from the starting price shown below.</p>
+    <div className="scenario-key"><span>Bear / downside</span><span>Base</span><span>Bull / upside</span><span>{currency} / {other}</span></div>
+    <div className="table-scroll"><table className="forecast-table"><thead><tr><th>Horizon</th><th>Bear</th><th>Base</th><th>Bull</th></tr></thead><tbody>{forecasts?.levels.map(row => <tr key={row.days}><th>{row.horizon}<small>{row.days} days</small></th>{['bear','base','bull'].map(kind => <td className={kind} key={kind}>{cash(row[kind])}<small>{cash(row[kind],other)}</small><span className="target-probability" title={`Model estimate for reaching ${row.probabilities?.[kind]?.direction} the target before ${row.days} days`}>{pct(row.probabilities?.[kind]?.touch)} touch</span></td>)}</tr>)}</tbody></table></div>
+    {!forecasts && <div className="empty"><p>Scenarios need a price and at least 91 daily candles.</p></div>}
+    <p className="small muted research-footnote">Starting price: {cash(anchorPrice)}{anchorTime ? ` · ${new Date(anchorTime).toISOString().replace('T',' ').slice(0,16)} UTC` : ''}. Scenarios refresh every minute.{stale && <span className="warning-text"> Source data is delayed.</span>}</p>
+    <div className="model-note"><CircleHelp size={17}/><div><strong>Model probabilities, not measured certainty</strong><p>These events overlap and do not add to 100%. Prices can touch both bear and bull targets. A target equal to the starting price is already reached (100%).</p></div></div>
+    <details className="method-details"><summary>Model & probability assumptions <ChevronDown size={14}/></summary><p>90 daily QNT/USDT log returns set volatility. Mean daily drift is reduced to 25% and capped at ±ln(2)/365. Base = spot × exp(drift × days). Bear/bull are the 10th/90th terminal percentiles. Touch probabilities use the continuous log-Brownian first-passage formula for each price barrier, not the percentile label.</p><p>The model assumes constant volatility, normal independent log returns, continuous trading and stable USDT/USD. Jumps, changing volatility, news and fundamentals are excluded. It has not been calibrated against realized target hits, so percentages may be materially inaccurate, particularly over long horizons. GBP conversions hold reference FX constant.</p></details>
+  </section>;
+}
+
+export function Backtests({ feed, cash, spot }) {
+  const [period,setPeriod] = useState('recent'), [selected,setSelected] = useState('sma');
+  const d = feed.data?.data;
+  const chosen = d?.strategies.find(s => s.id === selected), hold = d?.strategies[0];
+  const equity = chosen?.[period]?.equity || [], benchmark = hold?.[period]?.equity || [];
+  const values = [...equity,...benchmark].map(p=>p.value);
+  const low = values.length ? Math.min(...values)*.97 : 0, high = values.length ? Math.max(...values)*1.03 : 1;
+  const curve = points => points.map((p,i)=>`${i?'L':'M'}${(i/Math.max(1,points.length-1)*720).toFixed(1)},${(170-(p.value-low)/(high-low)*155).toFixed(1)}`).join(' ');
+  return <section id="backtest" className="backtest-section"><div className="section-title"><div><span className="eyebrow">TEST THE IDEAS</span><h2>Strategy backtest lab</h2></div><div className="segmented" aria-label="Backtest period"><button aria-pressed={period==='recent'} onClick={()=>setPeriod('recent')}>Recent 30%</button><button aria-pressed={period==='full'} onClick={()=>setPeriod('full')}>Full history</button></div></div>
+    <div className="panel"><p className="section-description">Long-only strategies versus buy-and-hold. $10,000 starting capital; 0.1% fee and 0.05% slippage per buy or sell. Signals execute at the next candle’s open.</p>
+      {d ? <><div className="backtest-metadata"><span>{date(period==='recent'?d.recentStart:d.start)} — {date(d.end)}</span><span>Daily · Binance QNT/USDT · USD-equivalent, assuming USDT ≈ USD</span></div><div className="table-scroll"><table className="backtest-table"><thead><tr><th>Strategy</th><th>Return</th><th>vs hold</th><th>Max drawdown</th><th>Trades</th><th>Win rate</th><th>Latest signal</th></tr></thead><tbody>{d.strategies.map(s=>{const r=s[period];return <tr key={s.id} className={s.id===selected?'selected-row':''}><th><button className="strategy-button" onClick={()=>setSelected(s.id)} aria-pressed={s.id===selected}>{s.name}</button></th><td className={r.returnPct>=0?'positive':'negative'}>{fmt(r.returnPct)}%</td><td>{fmt(r.returnPct-hold[period].returnPct)} pp</td><td className="negative">−{fmt(r.maxDrawdown)}%</td><td>{r.trades}</td><td>{r.winRate===null?'—':`${fmt(r.winRate)}%`}</td><td><Badge signal={s.currentSignal}/></td></tr>;})}</tbody></table></div>
+      <div className="backtest-chart-heading"><strong>{chosen?.name}</strong><span className="muted">{cash(chosen?.[period].finalValue)} final value · {fmt(chosen?.[period].exposure)}% market exposure</span></div>
+      <svg viewBox="0 0 720 185" className="equity-chart" role="img" aria-label={`${chosen?.name} equity versus buy and hold from the same starting capital`}><path d={curve(benchmark)} fill="none" stroke="#899283" strokeDasharray="5 5" strokeWidth="1.5"/><path d={curve(equity)} fill="none" stroke="#c4ef98" strokeWidth="2"/></svg>
+      <div className="panel-foot"><span><i className="legend-dot"/>{chosen?.name}<i className="legend-dot neutral"/>Buy & hold</span><span>Execution costs: {cash(chosen?.[period].costs)}</span></div><p className="small muted research-footnote">{chosen?.rule} All positions liquidated at the final close, including exit costs. Drawdown is measured at daily closes, so intraday losses can be larger.</p>
+      {chosen?.forward.length>0 && <div className="forward-evidence"><h3>What followed earlier entry signals?</h3><p className="small muted">Full-history, non-overlapping entry episodes; gross market returns, not strategy profits. This is historical context, not a calibrated price forecast.</p><div className="evidence-grid">{chosen.forward.map(f=><div key={f.days}><span className="eyebrow">{f.days}-DAY FORWARD RETURN</span><strong>{f.adequate?`${fmt(f.medianReturn*100)}% median`:'Insufficient evidence'}</strong><p>{f.samples} non-overlapping observations{f.adequate?` · ${pct(f.positiveRate)} finished higher`: ' · minimum 20 required'}</p>{f.adequate && spot && <small>Applying the historical median today: {cash(spot*(1+f.medianReturn))}</small>}</div>)}</div></div>}
+      <details className="method-details"><summary>Backtest limitations & validation <ChevronDown size={14}/></summary><p>Indicators use only candles available when each signal was made. 200 initial candles are reserved for warm-up. The recent 30% view restarts every strategy in cash using pre-existing signals; parameters are fixed, not optimized on this slice. It is a chronological validation slice, not proof of future performance or a fully independent out-of-sample study.</p><p>All capital is committed when long. Cash earns no interest; taxes, liquidity constraints, outages and market impact beyond the fixed slippage are excluded. Win rate uses completed round trips including the final liquidation. A high return with few trades or deep drawdown is weak evidence. Selecting a winner after viewing these results creates selection bias.</p></details></> : <div className="empty"><p>{feed.loading?'Loading daily history and simulating six strategies…':'Backtest history unavailable. Try refreshing the dashboard.'}</p></div>}
+      {(feed.error || feed.data?.status==='stale') && <p className="warning-text small">Backtest data is stale or disconnected.</p>}
+    </div></section>;
+}
+
+export function SocialWatchlist() {
+  return <div className="social-watchlist"><div><h3>X account watchlist</h3><p className="small muted">Direct links only. X posts are not automatically ingested. Company announcements below come directly from quant.network; media headlines come from Google News.</p></div><div className="social-links">{['Legitcryptonerd','SanNL11','MindCrypto_','coinbureau','IOV_OWL','quantnetwork'].map(account=><a key={account} href={`https://x.com/${account}`} target="_blank" rel="noopener noreferrer">@{account}<ExternalLink size={12}/></a>)}</div></div>;
+}
