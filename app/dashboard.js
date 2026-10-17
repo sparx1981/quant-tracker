@@ -7,6 +7,7 @@ import DataQuality from './quality';
 import Link from 'next/link';
 import Provenance from './provenance';
 import FeedHealth from './feeds';
+import PaperResearch from './paper';
 import { Momentum, Scenarios, Backtests, SocialWatchlist } from './research';
 import { Activity, ArrowDownLeft, ArrowUpRight, Bell, BookOpen, ChevronDown, CircleHelp, Coins, ExternalLink, Globe2, LayoutDashboard, LockKeyhole, Radio, RefreshCw, ShieldCheck, Wallet, Waves } from 'lucide-react';
 
@@ -161,6 +162,7 @@ export default function Dashboard({ view = 'overview' }) {
         </>}
         <Provenance view={view} market={marketFeed.data} quote={quoteFeed.data} chain={chain} news={newsFeed.data} />
         {view === 'research' && <>
+        <PaperResearch />
         <SignalJournal stance={momentumFeed.data?.data?.analysis?.stance} price={market?.price} candles={history?.candles} />
         <div className="analysis-grid" id="momentum">
           <Momentum feed={momentumFeed} timeframe={momentumTimeframe} setTimeframe={setMomentumTimeframe} refresh={momentumFeed.refresh}/>

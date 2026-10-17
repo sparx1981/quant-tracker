@@ -91,3 +91,7 @@ Official announcements come directly from Quant RSS. Twelve selected X accounts 
 
 The logo uses Quant's official artwork, tinted through a CSS mask: https://quant.network/assets/uploads/2025/08/Quant-logo_300x200.png .
 
+# QNT paper research worker
+
+The Research view now includes a separate QNT-only paper experiment, with a scheduled GitHub worker, SQLite ledger, daily reports and source evidence. See [setup, methodology and limitations](paper-agent/README.md). No new Vercel credentials are required. It never uses real holdings or submits orders.
+

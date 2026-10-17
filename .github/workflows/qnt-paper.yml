@@ -1,0 +1,62 @@
+name: QNT paper research
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['paper-agent/**', '.github/workflows/qnt-paper.yml']
+permissions:
+  contents: write
+concurrency:
+  group: qnt-paper-ledger
+  cancel-in-progress: false
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: paper-agent/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: paper-agent/package-lock.json
+      - name: Install reviewed read-only MCP servers
+        run: |
+          pip install -r paper-agent/requirements.txt
+          npm ci --prefix paper-agent --ignore-scripts
+          python -m unittest discover -s paper-agent -p 'test_*.py'
+      - name: Restore durable paper ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          refs=$(git ls-remote --heads origin paper-ledger)
+          if [ -n "$refs" ]; then
+            git fetch origin paper-ledger
+            git worktree add ledger-state FETCH_HEAD
+            test -s ledger-state/ledger.sqlite
+          else
+            git worktree add --detach ledger-state
+            cd ledger-state
+            git checkout --orphan paper-ledger
+            git rm -rf .
+          fi
+      - name: Observe QNT and simulate only
+        run: python paper-agent/run.py --data ledger-state
+      - name: Persist SQLite, dashboard summary and daily reports
+        working-directory: ledger-state
+        run: |
+          git config user.name 'qnt-paper-bot'
+          git config user.email 'qnt-paper-bot@users.noreply.github.com'
+          printf '%s\n' '{"git":{"deploymentEnabled":false}}' > vercel.json
+          git add ledger.sqlite summary.json '*.md' vercel.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record QNT paper observation'
+            git push origin HEAD:paper-ledger
+          fi

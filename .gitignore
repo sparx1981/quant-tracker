@@ -6,6 +6,10 @@ node_modules/
 test-results/
 playwright-report/
 *.log
+.paper-venv/
+paper-agent/data/
+paper-agent/node_modules/
+__pycache__/
 
 .vercel
 .env*
