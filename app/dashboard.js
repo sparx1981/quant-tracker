@@ -8,8 +8,9 @@ import Link from 'next/link';
 import Provenance from './provenance';
 import FeedHealth from './feeds';
 import PaperResearch, { DailyReports } from './paper';
+import Portfolio from './portfolio';
 import { Momentum, Scenarios, Backtests, SocialWatchlist } from './research';
-import { Activity, ArrowDownLeft, ArrowUpRight, Bell, BookOpen, ChevronDown, CircleHelp, Coins, ExternalLink, Globe2, FlaskConical, LayoutDashboard, LockKeyhole, Radio, RefreshCw, ShieldCheck, Wallet, Waves } from 'lucide-react';
+import { Activity, ArrowDownLeft, ArrowUpRight, Bell, BookOpen, ChevronDown, CircleHelp, Coins, ExternalLink, Globe2, FlaskConical, LayoutDashboard, PieChart, LockKeyhole, Radio, RefreshCw, ShieldCheck, Wallet, Waves } from 'lucide-react';
 
 const fmt = (value, digits = 0) => Number.isFinite(value) ? value.toLocaleString('en-GB', { maximumFractionDigits: digits }) : '—';
 const compact = value => Number.isFinite(value) ? Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 }).format(value) : '—';
@@ -131,14 +132,14 @@ export default function Dashboard({ view = 'overview' }) {
   return <div className="app-shell">
     <aside className="sidebar">
       <a className="brand" href="/"><span className="quant-mark" role="img" aria-label="Official Quant mark"/><span>Quant<span className="brand-sub">TRACKER</span></span></a>
-      <nav aria-label="Dashboard views">{[['overview', '/', LayoutDashboard, 'Overview'], ['research', '/research', Activity, 'Research'], ['paper', '/paper', FlaskConical, 'Paper Research'], ['health', '/data-health', Radio, 'Data Health']].map(([id, href, Icon, label]) => <Link key={id} href={href} aria-current={view === id ? 'page' : undefined} className={view === id ? 'active' : ''}><Icon size={18}/>{label}</Link>)}</nav>
+      <nav aria-label="Dashboard views">{[['overview', '/', LayoutDashboard, 'Overview'], ['research', '/research', Activity, 'Research'], ['portfolio', '/portfolio', PieChart, 'Portfolio'], ['paper', '/paper', FlaskConical, 'Paper Research'], ['health', '/data-health', Radio, 'Data Health']].map(([id, href, Icon, label]) => <Link key={id} href={href} aria-current={view === id ? 'page' : undefined} className={view === id ? 'active' : ''}><Icon size={18}/>{label}</Link>)}</nav>
       <div className="sidebar-bottom"><a href="#methodology" className="method-link"><BookOpen size={16}/>Sources & methodology<ArrowUpRight size={15}/></a></div>
     </aside>
 
     <main>
       <div className="content">
-        <section id="overview" className="page-heading"><div><div className="eyebrow">THE QUANT INTELLIGENCE DASHBOARD</div><h1>{view === 'research' ? 'Research' : view === 'paper' ? 'Paper Research' : view === 'health' ? 'Data Health' : 'A closer look at QNT'}<span>.</span></h1><p>Your position, the market, and the signals that matter.</p></div><div className="heading-controls"><div className="segmented currency" aria-label="Primary display currency">{['USD', 'GBP'].map(c => <button key={c} onClick={() => setCurrency(c)} aria-pressed={currency === c}>{c}</button>)}</div><button className="icon-button refresh" aria-label="Refresh dashboard data" onClick={refresh} disabled={busy}><RefreshCw size={17} className={busy ? 'spinning' : ''}/></button></div></section>
-        <div className="market-line"><span><i className={`status-dot ${marketStale ? 'amber' : ''}`}/>{market ? marketStale ? 'Market data delayed' : 'Market connected' : marketFeed.loading ? 'Connecting to market sources' : 'Market unavailable'}</span><span>{market?.updatedAt ? `Price as of ${date(market.updatedAt)}, ${time(market.updatedAt)} London` : 'USD prices refresh every 15 seconds while open'}</span><span className="market-line-last">{quote ? quote.source : "Snapshot fallback"} <span className="muted">/ polls every 15s</span></span></div>
+        <section id="overview" className="page-heading"><div><div className="eyebrow">THE QUANT INTELLIGENCE DASHBOARD</div><h1>{view === 'research' ? 'Research' : view === 'paper' ? 'Paper Research' : view === 'portfolio' ? 'Portfolio' : view === 'health' ? 'Data Health' : 'A closer look at QNT'}<span>.</span></h1><p>Your position, the market, and the signals that matter.</p></div><div className="heading-controls">{view !== 'portfolio' && view !== 'paper' && <div className="segmented currency" aria-label="Primary display currency">{['USD', 'GBP'].map(c => <button key={c} onClick={() => setCurrency(c)} aria-pressed={currency === c}>{c}</button>)}</div>}<button className="icon-button refresh" aria-label="Refresh dashboard data" onClick={refresh} disabled={busy}><RefreshCw size={17} className={busy ? 'spinning' : ''}/></button></div></section>
+        {view !== 'portfolio' && view !== 'paper' && <div className="market-line"><span><i className={`status-dot ${marketStale ? 'amber' : ''}`}/>{market ? marketStale ? 'Market data delayed' : 'Market connected' : marketFeed.loading ? 'Connecting to market sources' : 'Market unavailable'}</span><span>{market?.updatedAt ? `Price as of ${date(market.updatedAt)}, ${time(market.updatedAt)} London` : 'USD prices refresh every 15 seconds while open'}</span><span className="market-line-last">{quote ? quote.source : "Snapshot fallback"} <span className="muted">/ polls every 15s</span></span></div>}
         {issues.length > 0 && <div className="notice" role="status">{issues.join(' · ')}. Use refresh to retry; unavailable values are never replaced with sample data.</div>}
 
         {view === 'overview' && <>
@@ -160,7 +161,8 @@ export default function Dashboard({ view = 'overview' }) {
         <FeedHealth />
         <p className="panel small">Public archive: {marketFeed.data?.archive?.message || 'Waiting for market snapshot.'} Holdings and cost basis stay on your device.</p>
         </>}
-        {view !== 'paper' && <Provenance view={view} market={marketFeed.data} quote={quoteFeed.data} chain={chain} news={newsFeed.data} />}
+        {view !== 'paper' && view !== 'portfolio' && <Provenance view={view} market={marketFeed.data} quote={quoteFeed.data} chain={chain} news={newsFeed.data} />}
+        {view === 'portfolio' && <Portfolio />}
         {view === 'paper' && <><PaperResearch /><DailyReports /></>}
         {view === 'research' && <>
         <SignalJournal stance={momentumFeed.data?.data?.analysis?.stance} price={market?.price} candles={history?.candles} />
