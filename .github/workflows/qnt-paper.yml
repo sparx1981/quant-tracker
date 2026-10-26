@@ -1,7 +1,7 @@
 name: QNT paper research
 on:
   schedule:
-    - cron: '7,22,37,52 * * * *'
+    - cron: '7 */2 * * *'
   workflow_dispatch:
   push:
     branches: [main]
@@ -14,7 +14,7 @@ concurrency:
 jobs:
   observe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -47,16 +47,25 @@ jobs:
             git checkout --orphan paper-ledger
             git rm -rf .
           fi
-      - name: Observe QNT and simulate only
-        run: python paper-agent/run.py --data ledger-state
-      - name: Persist SQLite, dashboard summary and daily reports
-        working-directory: ledger-state
+      - name: Observe QNT every 15 minutes and persist (simulation only)
+        shell: bash
         run: |
+          set -euo pipefail
+          # GitHub drops or delays scheduled starts, so one job keeps the 15-minute cadence for ~4.5 hours.
+          # Overlapping scheduled starts queue behind it (see concurrency) and take over when it ends.
+          end=$((SECONDS + 16200))
+          cd ledger-state
           git config user.name 'qnt-paper-bot'
           git config user.email 'qnt-paper-bot@users.noreply.github.com'
           printf '%s\n' '{"git":{"deploymentEnabled":false}}' > vercel.json
-          git add ledger.sqlite summary.json '*.md' vercel.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'Record QNT paper observation'
-            git push origin HEAD:paper-ledger
-          fi
+          while true; do
+            python ../paper-agent/run.py --data .
+            git add ledger.sqlite summary.json reports.json '*.md' vercel.json
+            if ! git diff --cached --quiet; then
+              git commit -m 'Record QNT paper observation'
+              git push origin HEAD:paper-ledger
+            fi
+            wait=$((900 - $(date +%s) % 900 + 20))
+            if [ $((SECONDS + wait)) -ge $end ]; then break; fi
+            sleep "$wait"
+          done

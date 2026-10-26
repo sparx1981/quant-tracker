@@ -80,6 +80,10 @@ class LedgerTests(unittest.TestCase):
             self.assertEqual(report['decisions'][0]['action'],'HOLD')
             self.assertTrue(list(Path(directory).glob('*.md')))
             self.assertEqual(json.loads((Path(directory)/'summary.json').read_text())['mode'],'PAPER')
+            self.assertAlmostEqual(report['recent_coverage'],200/3)
+            bundle = json.loads((Path(directory)/'reports.json').read_text())['reports']
+            self.assertEqual(len(bundle),1)
+            self.assertTrue(bundle[0]['markdown'].startswith('# QNT paper report'))
 
     def test_parser_completed_bars_and_gaps(self):
         raw = 'Time: 2026-10-17 08:00:00\nOpen: 100.00000000\nHigh: 102.00000000\nLow: 99.00000000\nClose: 101.00000000\nVolume: 200.00\n---'

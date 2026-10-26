@@ -128,9 +128,11 @@ def export(db, directory, now):
     positions = [dict(r) for r in db.execute('SELECT * FROM positions')]
     count = db.execute('SELECT COUNT(*) FROM runs').fetchone()[0]
     expected = max(1, int(now//900)-int(s['started']//900)+1)
+    recent = db.execute('SELECT COUNT(*) FROM runs WHERE at > ?', (now-86400,)).fetchone()[0]
     result = dict(schema=1, mode='PAPER', symbol='QNT/USD', strategy=VERSION, updated_at=utc(now),
                   started_at=utc(s['started']), days_observed=(now-s['started'])/86400, runs=count,
-                  coverage=min(100,count/expected*100), cash=s['cash'], equity=runs[0]['equity'],
+                  coverage=min(100,count/expected*100),
+                  recent_coverage=min(100,recent/min(96,expected)*100), cash=s['cash'], equity=runs[0]['equity'],
                   pnl=runs[0]['equity']-START, realized_pnl=sum(t['pnl'] for t in closed),
                   win_rate=sum(t['pnl']>0 for t in closed)/len(closed)*100 if closed else None,
                   closed_trades=len(closed), max_drawdown=s['drawdown'], positions=positions,
@@ -158,4 +160,9 @@ def export(db, directory, now):
                '- Two weeks is a minimum observation window, not evidence of predictive accuracy.', '\n## Decision log']
     report += [f"- {utc(r['at'])} **{r['action']}**: {r['reason']}" for r in reversed(daily_runs)]
     (directory/f'{day}.md').write_text('\n'.join(report)+'\n',encoding='utf-8')
+    # Same files the dashboard shows, bundled so it needs one fetch rather than a directory listing.
+    files = sorted(directory.glob('????-??-??.md'), reverse=True)[:60]
+    bundle = [dict(date=f.stem, markdown=f.read_text(encoding='utf-8')) for f in files]
+    (directory/'reports.tmp').write_text(json.dumps(dict(schema=1, reports=bundle),allow_nan=False), encoding='utf-8')
+    (directory/'reports.tmp').replace(directory/'reports.json')
     return result
