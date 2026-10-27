@@ -3,11 +3,11 @@
   "mode": "PAPER",
   "symbol": "QNT/USD",
   "strategy": "qnt-trend-v1",
-  "updated_at": "2026-10-27T05:15:30.149253+00:00",
+  "updated_at": "2026-10-27T05:30:30.152711+00:00",
   "started_at": "2026-10-17T08:25:17.751441+00:00",
-  "days_observed": 9.868199048745963,
-  "runs": 134,
-  "coverage": 14.120126448893572,
+  "days_observed": 9.878615755444324,
+  "runs": 135,
+  "coverage": 14.210526315789473,
   "recent_coverage": 77.08333333333334,
   "cash": 10000.0,
   "equity": 10000.0,
@@ -18,6 +18,50 @@
   "max_drawdown": 0.0,
   "positions": [],
   "decisions": [
+    {
+      "slot": 1992310,
+      "at": "2026-10-27T05:30:30.152711+00:00",
+      "action": "HOLD",
+      "reason": "1h RSI 24.6; 1h volatility 1.76%; volume 0.43x prior 20 bars; DEX liquidity $1,014,160. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
+      "equity": 10000.0,
+      "evidence": {
+        "price": 196.9,
+        "bid": 196.71,
+        "ask": 196.87,
+        "volume_24h": 58407.57056657,
+        "quote_fetched_at": 1793079024.128886,
+        "source": "CCXT MCP / Kraken QNT/USD",
+        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
+        "indicators": {
+          "1h": {
+            "sma20": 206.271,
+            "sma50": 195.3922,
+            "rsi": 24.648735447611443,
+            "volatility": 1.7605887517234928,
+            "volume_ratio": 0.43083799538718137,
+            "close": 200.38,
+            "candle_at": 1793073600.0
+          },
+          "4h": {
+            "sma20": 189.603,
+            "sma50": 192.2248,
+            "rsi": 68.10305167919032,
+            "volatility": 2.8952280067065512,
+            "volume_ratio": 0.3767634139599322,
+            "close": 201.5,
+            "candle_at": 1793059200.0
+          }
+        },
+        "bearish": false,
+        "liquidity_updated_at": 1793078970.0,
+        "liquidity_usd": 1014159.5161173434,
+        "volume_spike": false,
+        "eligible": true,
+        "bullish": false,
+        "reason": "1h RSI 24.6; 1h volatility 1.76%; volume 0.43x prior 20 bars; DEX liquidity $1,014,160. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
+        "strategy": "qnt-trend-v1"
+      }
+    },
     {
       "slot": 1992309,
       "at": "2026-10-27T05:15:30.149253+00:00",
@@ -1023,50 +1067,6 @@
         "eligible": true,
         "bullish": false,
         "reason": "1h RSI 53.5; 1h volatility 1.79%; volume 0.17x prior 20 bars; DEX liquidity $993,332. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
-        "strategy": "qnt-trend-v1"
-      }
-    },
-    {
-      "slot": 1992286,
-      "at": "2026-10-26T23:30:31.269391+00:00",
-      "action": "HOLD",
-      "reason": "1h RSI 53.5; 1h volatility 1.79%; volume 0.17x prior 20 bars; DEX liquidity $997,348. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
-      "equity": 10000.0,
-      "evidence": {
-        "price": 201.74,
-        "bid": 201.75,
-        "ask": 201.9,
-        "volume_24h": 59426.04003468,
-        "quote_fetched_at": 1793057424.5911431,
-        "source": "CCXT MCP / Kraken QNT/USD",
-        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
-        "indicators": {
-          "1h": {
-            "sma20": 203.5625,
-            "sma50": 192.6446,
-            "rsi": 53.52770977075452,
-            "volatility": 1.7941593566420788,
-            "volume_ratio": 0.16899050695915488,
-            "close": 201.81,
-            "candle_at": 1793052000.0
-          },
-          "4h": {
-            "sma20": 187.498,
-            "sma50": 191.56,
-            "rsi": 68.87218045112785,
-            "volatility": 2.9048357965835097,
-            "volume_ratio": 2.095282067100025,
-            "close": 203.3,
-            "candle_at": 1793030400.0
-          }
-        },
-        "bearish": false,
-        "liquidity_updated_at": 1793057370.0,
-        "liquidity_usd": 997348.1254452649,
-        "volume_spike": false,
-        "eligible": true,
-        "bullish": false,
-        "reason": "1h RSI 53.5; 1h volatility 1.79%; volume 0.17x prior 20 bars; DEX liquidity $997,348. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
         "strategy": "qnt-trend-v1"
       }
     }
