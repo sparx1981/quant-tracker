@@ -3,12 +3,12 @@
   "mode": "PAPER",
   "symbol": "QNT/USD",
   "strategy": "qnt-trend-v1",
-  "updated_at": "2026-10-28T16:30:32.075625+00:00",
+  "updated_at": "2026-10-28T16:45:31.850428+00:00",
   "started_at": "2026-10-17T08:25:17.751441+00:00",
-  "days_observed": 11.336971344727058,
-  "runs": 242,
-  "coverage": 22.201834862385322,
-  "recent_coverage": 76.04166666666666,
+  "days_observed": 11.347385404943315,
+  "runs": 243,
+  "coverage": 22.273143904674612,
+  "recent_coverage": 77.08333333333334,
   "cash": 10000.0,
   "equity": 10000.0,
   "pnl": 0.0,
@@ -18,6 +18,46 @@
   "max_drawdown": 0.0,
   "positions": [],
   "decisions": [
+    {
+      "slot": 1992451,
+      "at": "2026-10-28T16:45:31.850428+00:00",
+      "action": "HOLD",
+      "reason": "Entry blocked: Stale DexPaprika liquidity; missing/invalid analysis or liquidity data.",
+      "equity": 10000.0,
+      "evidence": {
+        "price": 193.5,
+        "bid": 193.45,
+        "ask": 193.47,
+        "volume_24h": 24318.42927289,
+        "quote_fetched_at": 1793205924.793381,
+        "source": "CCXT MCP / Kraken QNT/USD",
+        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
+        "indicators": {
+          "1h": {
+            "sma20": 198.4205,
+            "sma50": 200.9516,
+            "rsi": 35.684210526315695,
+            "volatility": 0.7191774212445728,
+            "volume_ratio": 0.8736708090861764,
+            "close": 193.67,
+            "candle_at": 1793199600.0
+          },
+          "4h": {
+            "sma20": 198.4905,
+            "sma50": 193.0592,
+            "rsi": 49.408194233687404,
+            "volatility": 3.160121721420938,
+            "volume_ratio": 0.6535857136984714,
+            "close": 193.67,
+            "candle_at": 1793188800.0
+          }
+        },
+        "bearish": false,
+        "eligible": false,
+        "reason": "Entry blocked: Stale DexPaprika liquidity; missing/invalid analysis or liquidity data.",
+        "strategy": "qnt-trend-v1"
+      }
+    },
     {
       "slot": 1992450,
       "at": "2026-10-28T16:30:32.075625+00:00",
@@ -1023,50 +1063,6 @@
         "eligible": true,
         "bullish": false,
         "reason": "1h RSI 53.8; 1h volatility 0.66%; volume 2.33x prior 20 bars; DEX liquidity $1,016,552. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
-        "strategy": "qnt-trend-v1"
-      }
-    },
-    {
-      "slot": 1992417,
-      "at": "2026-10-28T08:15:31.762789+00:00",
-      "action": "HOLD",
-      "reason": "1h RSI 53.8; 1h volatility 0.66%; volume 2.33x prior 20 bars; DEX liquidity $1,013,325. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
-      "equity": 10000.0,
-      "evidence": {
-        "price": 198.91,
-        "bid": 198.87,
-        "ask": 198.98,
-        "volume_24h": 31139.65910178,
-        "quote_fetched_at": 1793175325.1248362,
-        "source": "CCXT MCP / Kraken QNT/USD",
-        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
-        "indicators": {
-          "1h": {
-            "sma20": 199.139,
-            "sma50": 202.3712,
-            "rsi": 53.83244206773611,
-            "volatility": 0.6590631192500445,
-            "volume_ratio": 2.333126262285132,
-            "close": 199.26,
-            "candle_at": 1793170800.0
-          },
-          "4h": {
-            "sma20": 197.0865,
-            "sma50": 192.9828,
-            "rsi": 57.02853691680509,
-            "volatility": 3.086582155239478,
-            "volume_ratio": 0.6615084753886217,
-            "close": 199.26,
-            "candle_at": 1793160000.0
-          }
-        },
-        "bearish": false,
-        "liquidity_updated_at": 1793174970.0,
-        "liquidity_usd": 1013325.0648999803,
-        "volume_spike": true,
-        "eligible": true,
-        "bullish": false,
-        "reason": "1h RSI 53.8; 1h volatility 0.66%; volume 2.33x prior 20 bars; DEX liquidity $1,013,325. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
         "strategy": "qnt-trend-v1"
       }
     }
