@@ -8,6 +8,7 @@ on:
     paths: ['paper-agent/**', '.github/workflows/qnt-paper.yml']
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: qnt-paper-ledger
   cancel-in-progress: false
@@ -51,21 +52,38 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # GitHub drops or delays scheduled starts, so one job keeps the 15-minute cadence for ~4.5 hours.
-          # Overlapping scheduled starts queue behind it (see concurrency) and take over when it ends.
+          # GitHub drops or delays scheduled starts, so one job keeps the 15-minute cadence for ~4.5 hours,
+          # then queues its own successor (next step) so coverage does not depend on the scheduler.
           end=$((SECONDS + 16200))
           cd ledger-state
           git config user.name 'qnt-paper-bot'
           git config user.email 'qnt-paper-bot@users.noreply.github.com'
           printf '%s\n' '{"git":{"deploymentEnabled":false}}' > vercel.json
+          # A transient push error (e.g. GitHub 5xx) must not end the job: retry, and otherwise leave the
+          # commit in place so the next observation's push carries it. Never force-push.
+          push() {
+            for delay in 5 15 45; do
+              git push origin HEAD:paper-ledger && return 0
+              sleep "$delay"
+            done
+            git push origin HEAD:paper-ledger
+          }
           while true; do
             python ../paper-agent/run.py --data .
             git add ledger.sqlite summary.json reports.json '*.md' vercel.json
             if ! git diff --cached --quiet; then
               git commit -m 'Record QNT paper observation'
-              git push origin HEAD:paper-ledger
             fi
+            push || echo '::warning::Push failed; will retry with the next observation'
             wait=$((900 - $(date +%s) % 900 + 20))
             if [ $((SECONDS + wait)) -ge $end ]; then break; fi
             sleep "$wait"
           done
+          # The final state must reach the branch, or this job fails rather than losing observations.
+          push
+      - name: Queue the next job
+        if: success() || failure()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run qnt-paper.yml --repo "$GITHUB_REPOSITORY" --ref main
