@@ -2,13 +2,13 @@ import argparse
 import asyncio
 import time
 from pathlib import Path
-from engine import connect, step, export
+from engine import connect, step, export, LEDGER
 from feeds import collect
 
 
 def run(directory):
     Path(directory).mkdir(parents=True, exist_ok=True)
-    db = connect(Path(directory)/'ledger.sqlite')
+    db = connect(Path(directory)/LEDGER)
     try:
         try:
             data = asyncio.run(asyncio.wait_for(collect(), 240))

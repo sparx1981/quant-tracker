@@ -66,6 +66,7 @@ export function DailyReports() {
 
 export default function PaperResearch() {
   const [report, setReport] = useState(null);
+  const [before, setBefore] = useState(null);
   const [error, setError] = useState('');
   const [now, setNow] = useState(0);
   useEffect(() => {
@@ -78,7 +79,7 @@ export default function PaperResearch() {
         const response = await fetch('/api/paper', { signal: controller.signal });
         const result = await response.json();
         if (result.status !== 'ok') throw new Error(result.message);
-        setReport(result.data); setError('');
+        setReport(result.data); setBefore(result.previous || null); setError('');
       } catch (e) { if (!controller.signal.aborted) setError(e.message || 'Paper report unavailable.'); }
       finally { busy = false; if (!controller.signal.aborted) setNow(Date.now()); }
     }
@@ -91,12 +92,13 @@ export default function PaperResearch() {
   return <section className="panel paper-research" aria-labelledby="paper-title">
     <div className="section-title"><h2 id="paper-title">QNT paper research</h2><span className="badge">PAPER ONLY · USD</span></div>
     <p className="section-description">A separate $10,000 experiment. Checks QNT every 15 minutes, records its reasoning and simulates trades. Your holdings are never used.</p>
-    <p className="small">5% of cash per entry · one QNT position · 3% stop trigger · 6% profit trigger · no leverage.</p>
+    <p className="small">5% of cash per entry · one QNT position · 3% stop trigger · 6% profit trigger · 24-hour pause after any exit · no leverage.</p>
     {error && <p role="status" className="paper-notice">{error}</p>}
     {report && <>
       <p className="paper-notice">{stale ? 'STALE — scheduled observations are overdue.' : 'Latest observation: '+new Date(report.updated_at).toLocaleString('en-GB')}
         {' '}{report.days_observed < 14 ? `${report.days_observed.toFixed(1)} of 14 minimum observation days.` : 'Minimum observation window elapsed; results remain experimental.'}
       </p>
+      <p className="small">Strategy {report.strategy}, started {new Date(report.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}.{before && <> Replaced strategy {before.strategy} (frozen {new Date(before.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}): {money(before.equity)} equity, {before.closed_trades} closed trades{Number.isFinite(before.win_rate) ? `, ${before.win_rate.toFixed(0)}% win rate` : ''} over {before.days_observed.toFixed(0)} days. Not combined with the figures below. v2 adds a 24-hour no-entry pause after any exit; in a two-year hourly back-test this reduced losing re-entries after stop-outs, but the sample is small and it is not a predictor.</>}</p>
       {sparse && <p className="paper-notice warning-text" role="status">Sparse sampling: {Number.isFinite(report.recent_coverage) ? `${report.recent_coverage.toFixed(0)}% of the last 24 hours' ` : `${report.coverage.toFixed(1)}% of `}scheduled 15-minute observations were recorded ({report.runs} runs since start). Entries and stop or profit triggers between observations may have been missed, so results understate what the rules would have done.</p>}
       <div className="quality-grid">
         <div><strong>{money(report.equity)}</strong><p>Paper equity · net of estimated exit costs</p></div>

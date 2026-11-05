@@ -41,7 +41,8 @@ jobs:
           if [ -n "$refs" ]; then
             git fetch origin paper-ledger
             git worktree add ledger-state FETCH_HEAD
-            test -s ledger-state/ledger.sqlite
+            # Any strategy version's ledger counts; a new version starts its own account next to the frozen old one.
+            compgen -G 'ledger-state/ledger*.sqlite' >/dev/null
           else
             git worktree add --detach ledger-state
             cd ledger-state
@@ -70,7 +71,7 @@ jobs:
           }
           while true; do
             python ../paper-agent/run.py --data .
-            git add ledger.sqlite summary.json reports.json '*.md' vercel.json
+            git add 'ledger*.sqlite' 'summary*.json' reports.json '*.md' vercel.json
             if ! git diff --cached --quiet; then
               git commit -m 'Record QNT paper observation'
             fi

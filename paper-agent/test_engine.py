@@ -55,6 +55,26 @@ class LedgerTests(unittest.TestCase):
         step(self.db,self.now+900,data(self.now+900,107))
         self.assertGreater(self.db.execute("SELECT pnl FROM trades WHERE side='SELL'").fetchone()[0],0)
 
+    def test_cooldown_blocks_reentry_for_24h_after_exit(self):
+        step(self.db,self.now,data(self.now))
+        step(self.db,self.now+900,data(self.now+900,96))
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM positions').fetchone()[0],0)
+        step(self.db,self.now+1800,data(self.now+1800,96))
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM positions').fetchone()[0],0)
+        self.assertIn('cooldown',self.db.execute('SELECT reason FROM runs ORDER BY slot DESC').fetchone()[0])
+        later = self.now+900+86400+900
+        step(self.db,later,data(later,96))
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM positions').fetchone()[0],1)
+
+    def test_new_strategy_version_archives_previous_summary(self):
+        with tempfile.TemporaryDirectory() as directory:
+            old = Path(directory)/'summary.json'
+            old.write_text(json.dumps(dict(strategy='qnt-trend-v1',equity=1)))
+            step(self.db,self.now,data(self.now))
+            export(self.db,directory,self.now+1)
+            self.assertEqual(json.loads((Path(directory)/'summary-qnt-trend-v1.json').read_text())['equity'],1)
+            self.assertEqual(json.loads(old.read_text())['strategy'],'qnt-trend-v2')
+
     def test_missing_low_stale_liquidity_and_stale_quote_block_entry(self):
         for override in [dict(liquidity_usd=499999),dict(liquidity_usd=0),dict(liquidity_updated_at=0),dict(quote_fetched_at=0),dict(price=math.nan),dict(eligible=False)]:
             db = connect(':memory:')

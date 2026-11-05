@@ -1,0 +1,31 @@
+name: QNT paper watchdog
+# The observer job queues its own successor, but a failed hand-off or a dropped start would leave a gap.
+# This restarts it whenever nothing is running or waiting. Scheduled starts can be late, so it is only a backstop.
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+permissions:
+  actions: write
+  contents: read
+jobs:
+  heal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Start the observer if it is not running or queued
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          active=0
+          for status in in_progress queued waiting pending requested; do
+            n=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow qnt-paper.yml --status "$status" --json databaseId --jq length)
+            active=$((active + n))
+          done
+          if [ "$active" -eq 0 ]; then
+            echo 'Observer is not running or queued; starting it.'
+            gh workflow run qnt-paper.yml --repo "$GITHUB_REPOSITORY" --ref main
+          else
+            echo "Observer active ($active run(s))."
+          fi

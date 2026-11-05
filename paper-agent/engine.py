@@ -9,7 +9,9 @@ from statistics import mean, pstdev
 START = 10000.0
 FEE = 0.001
 SLIP = 0.0005
-VERSION = 'qnt-trend-v1'
+VERSION = 'qnt-trend-v2'
+LEDGER = f'ledger-{VERSION}.sqlite'
+COOLDOWN = 86400  # no new entry within 24h of any exit, to avoid re-entering after whipsaw stop-outs
 
 
 def utc(t):
@@ -92,6 +94,9 @@ def step(db, now, data=None, error=None):
                 db.execute('DELETE FROM positions')
                 p = None
                 action, reason = 'SELL', sell
+            elif (not p and data.get('eligible') and data.get('bullish') and data.get('liquidity_usd',0)>=500000 and 0 <= now-data.get('liquidity_updated_at',0)<=600
+                  and (db.execute("SELECT MAX(at) FROM trades WHERE side='SELL'").fetchone()[0] or 0) > now-COOLDOWN):
+                reason = data.get('reason', reason)+' Entry blocked: 24h re-entry cooldown after the last exit.'
             elif not p and data.get('eligible') and data.get('bullish') and data.get('liquidity_usd',0)>=500000 and 0 <= now-data.get('liquidity_updated_at',0)<=600:
                 # Includes entry fee, always at most 5% of unlevered cash. QNT has one position.
                 budget = s['cash']*.05
@@ -139,6 +144,14 @@ def export(db, directory, now):
                   decisions=[{**r,'at':utc(r['at']),'evidence':json.loads(r['evidence'])} for r in runs[:24]],
                   trades=[{**t,'at':utc(t['at'])} for t in trades[:100]])
     target = directory/'summary.json'
+    if target.exists():
+        # A different strategy version starts a new ledger; keep the previous one's final summary for comparison.
+        try:
+            old = json.loads(target.read_text(encoding='utf-8')).get('strategy')
+        except ValueError:
+            old = None
+        if old and old != VERSION:
+            target.replace(directory/f'summary-{old}.json')
     temporary = directory/'summary.tmp'
     temporary.write_text(json.dumps(result,indent=2,allow_nan=False), encoding='utf-8')
     temporary.replace(target)
@@ -146,7 +159,7 @@ def export(db, directory, now):
     daily_trades = [t for t in trades if utc(t['at'])[:10]==day]
     daily_runs = [r for r in runs if utc(r['at'])[:10]==day]
     losses = [t for t in daily_trades if t['pnl'] is not None and t['pnl']<0]
-    report = [f'# QNT paper report — {day} UTC', '', 'Experimental paper results are not predictive and are not live results.',
+    report = [f'# QNT paper report — {day} UTC', '', f'Strategy: {VERSION}. Experimental paper results are not predictive and are not live results.',
               f"\nLifetime equity: ${result['equity']:.2f}; total P&L: ${result['pnl']:.2f}; realized: ${result['realized_pnl']:.2f}.",
               f"Lifetime win rate: {result['win_rate']}% ({len(closed)} exits); sampled max drawdown: {s['drawdown']:.2f}%.",
               f"Observed days: {result['days_observed']:.2f}; schedule coverage: {result['coverage']:.1f}%.",
