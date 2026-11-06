@@ -3,10 +3,10 @@
   "mode": "PAPER",
   "symbol": "QNT/USD",
   "strategy": "qnt-trend-v2",
-  "updated_at": "2026-11-06T05:31:14.318399+00:00",
+  "updated_at": "2026-11-06T05:45:29.788209+00:00",
   "started_at": "2026-11-06T01:01:15.145324+00:00",
-  "days_observed": 0.1874904291138605,
-  "runs": 19,
+  "days_observed": 0.19739170006303874,
+  "runs": 20,
   "coverage": 100,
   "recent_coverage": 100,
   "cash": 10000.0,
@@ -18,6 +18,50 @@
   "max_drawdown": 0.0,
   "positions": [],
   "decisions": [
+    {
+      "slot": 1993271,
+      "at": "2026-11-06T05:45:29.788209+00:00",
+      "action": "HOLD",
+      "reason": "1h RSI 28.0; 1h volatility 1.16%; volume 0.09x prior 20 bars; DEX liquidity $967,453. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
+      "equity": 10000.0,
+      "evidence": {
+        "price": 189.23,
+        "bid": 189.08,
+        "ask": 189.2,
+        "volume_24h": 28028.68590468,
+        "quote_fetched_at": 1793943923.8956695,
+        "source": "CCXT MCP / Kraken QNT/USD",
+        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
+        "indicators": {
+          "1h": {
+            "sma20": 193.738,
+            "sma50": 198.1398,
+            "rsi": 28.042086001829702,
+            "volatility": 1.1609501510207798,
+            "volume_ratio": 0.08722680488384148,
+            "close": 189.72,
+            "candle_at": 1793937600.0
+          },
+          "4h": {
+            "sma20": 196.2215,
+            "sma50": 195.9254,
+            "rsi": 48.13181712694363,
+            "volatility": 1.890260788264971,
+            "volume_ratio": 0.69164981822194,
+            "close": 189.74,
+            "candle_at": 1793923200.0
+          }
+        },
+        "bearish": false,
+        "liquidity_updated_at": 1793943630.0,
+        "liquidity_usd": 967452.805681398,
+        "volume_spike": false,
+        "eligible": true,
+        "bullish": false,
+        "reason": "1h RSI 28.0; 1h volatility 1.16%; volume 0.09x prior 20 bars; DEX liquidity $967,453. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
+        "strategy": "qnt-trend-v2"
+      }
+    },
     {
       "slot": 1993270,
       "at": "2026-11-06T05:30:30.611419+00:00",
