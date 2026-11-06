@@ -3,11 +3,11 @@
   "mode": "PAPER",
   "symbol": "QNT/USD",
   "strategy": "qnt-trend-v1",
-  "updated_at": "2026-11-06T00:00:30.991163+00:00",
+  "updated_at": "2026-11-06T00:15:30.679548+00:00",
   "started_at": "2026-10-17T08:25:17.751441+00:00",
-  "days_observed": 19.6494587930761,
-  "runs": 804,
-  "coverage": 42.58474576271186,
+  "days_observed": 19.65987185308503,
+  "runs": 805,
+  "coverage": 42.615140285865536,
   "recent_coverage": 63.541666666666664,
   "cash": 9959.554116361167,
   "equity": 9959.554116361167,
@@ -18,6 +18,46 @@
   "max_drawdown": 0.6238514261352579,
   "positions": [],
   "decisions": [
+    {
+      "slot": 1993249,
+      "at": "2026-11-06T00:15:30.679548+00:00",
+      "action": "HOLD",
+      "reason": "Entry blocked: Stale DexPaprika liquidity; missing/invalid analysis or liquidity data.",
+      "equity": 9959.554116361167,
+      "evidence": {
+        "price": 189.24,
+        "bid": 188.99,
+        "ask": 189.12,
+        "volume_24h": 30116.57017715,
+        "quote_fetched_at": 1793924124.152382,
+        "source": "CCXT MCP / Kraken QNT/USD",
+        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
+        "indicators": {
+          "1h": {
+            "sma20": 197.447,
+            "sma50": 198.1324,
+            "rsi": 18.504672897196173,
+            "volatility": 1.09692930235816,
+            "volume_ratio": 3.0966171166002185,
+            "close": 188.59,
+            "candle_at": 1793919600.0
+          },
+          "4h": {
+            "sma20": 196.4645,
+            "sma50": 196.1422,
+            "rsi": 42.707652060170055,
+            "volatility": 2.04652325626573,
+            "volume_ratio": 1.3070874195257123,
+            "close": 188.59,
+            "candle_at": 1793908800.0
+          }
+        },
+        "bearish": false,
+        "eligible": false,
+        "reason": "Entry blocked: Stale DexPaprika liquidity; missing/invalid analysis or liquidity data.",
+        "strategy": "qnt-trend-v1"
+      }
+    },
     {
       "slot": 1993248,
       "at": "2026-11-06T00:00:30.991163+00:00",
@@ -1027,50 +1067,6 @@
         "eligible": true,
         "bullish": false,
         "reason": "1h RSI 46.0; 1h volatility 0.65%; volume 1.33x prior 20 bars; DEX liquidity $1,007,412. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
-        "strategy": "qnt-trend-v1"
-      }
-    },
-    {
-      "slot": 1993210,
-      "at": "2026-11-05T14:30:31.556328+00:00",
-      "action": "HOLD",
-      "reason": "1h RSI 46.0; 1h volatility 0.65%; volume 1.33x prior 20 bars; DEX liquidity $997,673. Entry trend/RSI criteria not met. Liquidity and spread gates passed. Existing QNT position retained; no pyramiding.",
-      "equity": 9977.794557947282,
-      "evidence": {
-        "price": 202.29,
-        "bid": 202.32,
-        "ask": 202.49,
-        "volume_24h": 31680.05858287,
-        "quote_fetched_at": 1793889024.6007297,
-        "source": "CCXT MCP / Kraken QNT/USD",
-        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
-        "indicators": {
-          "1h": {
-            "sma20": 203.861,
-            "sma50": 198.7698,
-            "rsi": 46.04872251931079,
-            "volatility": 0.6511997838092168,
-            "volume_ratio": 1.3267704848751958,
-            "close": 202.33,
-            "candle_at": 1793883600.0
-          },
-          "4h": {
-            "sma20": 197.798,
-            "sma50": 196.5512,
-            "rsi": 63.724405091311525,
-            "volatility": 1.7319259220165744,
-            "volume_ratio": 0.4824660319553359,
-            "close": 202.16,
-            "candle_at": 1793865600.0
-          }
-        },
-        "bearish": false,
-        "liquidity_updated_at": 1793888970.0,
-        "liquidity_usd": 997673.2485889969,
-        "volume_spike": false,
-        "eligible": true,
-        "bullish": false,
-        "reason": "1h RSI 46.0; 1h volatility 0.65%; volume 1.33x prior 20 bars; DEX liquidity $997,673. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
         "strategy": "qnt-trend-v1"
       }
     }
