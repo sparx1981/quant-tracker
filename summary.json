@@ -3,12 +3,12 @@
   "mode": "PAPER",
   "symbol": "QNT/USD",
   "strategy": "qnt-trend-v2",
-  "updated_at": "2026-11-12T08:30:30.289592+00:00",
+  "updated_at": "2026-11-12T08:45:30.597090+00:00",
   "started_at": "2026-11-06T01:01:15.145324+00:00",
-  "days_observed": 6.311980836435601,
-  "runs": 601,
-  "coverage": 99.01153212520593,
-  "recent_coverage": 94.79166666666666,
+  "days_observed": 6.322401062109404,
+  "runs": 602,
+  "coverage": 99.01315789473685,
+  "recent_coverage": 93.75,
   "cash": 9981.39702327796,
   "equity": 9981.39702327796,
   "pnl": -18.602976722040694,
@@ -18,6 +18,46 @@
   "max_drawdown": 0.23994364662666134,
   "positions": [],
   "decisions": [
+    {
+      "slot": 1993859,
+      "at": "2026-11-12T08:45:30.597090+00:00",
+      "action": "HOLD",
+      "reason": "Entry blocked: Stale DexPaprika liquidity; missing/invalid analysis or liquidity data.",
+      "equity": 9981.39702327796,
+      "evidence": {
+        "price": 164.35,
+        "bid": 164.13,
+        "ask": 164.22,
+        "volume_24h": 21258.427628,
+        "quote_fetched_at": 1794473124.4288313,
+        "source": "CCXT MCP / Kraken QNT/USD",
+        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
+        "indicators": {
+          "1h": {
+            "sma20": 172.3025,
+            "sma50": 178.4464,
+            "rsi": 24.320183837610102,
+            "volatility": 1.331485338555093,
+            "volume_ratio": 0.45672764752410805,
+            "close": 165.6,
+            "candle_at": 1794466800.0
+          },
+          "4h": {
+            "sma20": 184.85399999999998,
+            "sma50": 191.818,
+            "rsi": 6.131207847946044,
+            "volatility": 2.0404036535035464,
+            "volume_ratio": 0.9257085638880439,
+            "close": 165.6,
+            "candle_at": 1794456000.0
+          }
+        },
+        "bearish": true,
+        "eligible": false,
+        "reason": "Entry blocked: Stale DexPaprika liquidity; missing/invalid analysis or liquidity data.",
+        "strategy": "qnt-trend-v2"
+      }
+    },
     {
       "slot": 1993858,
       "at": "2026-11-12T08:30:30.289592+00:00",
@@ -1023,50 +1063,6 @@
         "eligible": true,
         "bullish": false,
         "reason": "1h RSI 29.4; 1h volatility 1.30%; volume 0.73x prior 20 bars; DEX liquidity $1,069,851. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
-        "strategy": "qnt-trend-v2"
-      }
-    },
-    {
-      "slot": 1993835,
-      "at": "2026-11-12T02:45:31.037894+00:00",
-      "action": "HOLD",
-      "reason": "1h RSI 27.9; 1h volatility 1.30%; volume 1.37x prior 20 bars; DEX liquidity $1,071,188. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
-      "equity": 9981.39702327796,
-      "evidence": {
-        "price": 165.33,
-        "bid": 165.15,
-        "ask": 165.24,
-        "volume_24h": 21362.89322635,
-        "quote_fetched_at": 1794451524.159002,
-        "source": "CCXT MCP / Kraken QNT/USD",
-        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
-        "indicators": {
-          "1h": {
-            "sma20": 176.306,
-            "sma50": 181.7612,
-            "rsi": 27.872195785180168,
-            "volatility": 1.303159481599941,
-            "volume_ratio": 1.3652101787556226,
-            "close": 165.06,
-            "candle_at": 1794445200.0
-          },
-          "4h": {
-            "sma20": 188.0695,
-            "sma50": 192.8584,
-            "rsi": 6.077180188392589,
-            "volatility": 2.063980155114747,
-            "volume_ratio": 2.5417881192861604,
-            "close": 170.94,
-            "candle_at": 1794427200.0
-          }
-        },
-        "bearish": true,
-        "liquidity_updated_at": 1794451440.0,
-        "liquidity_usd": 1071188.3069815102,
-        "volume_spike": false,
-        "eligible": true,
-        "bullish": false,
-        "reason": "1h RSI 27.9; 1h volatility 1.30%; volume 1.37x prior 20 bars; DEX liquidity $1,071,188. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
         "strategy": "qnt-trend-v2"
       }
     }
