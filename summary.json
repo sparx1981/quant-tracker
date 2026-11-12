@@ -3,11 +3,11 @@
   "mode": "PAPER",
   "symbol": "QNT/USD",
   "strategy": "qnt-trend-v2",
-  "updated_at": "2026-11-12T13:30:30.286855+00:00",
+  "updated_at": "2026-11-12T13:45:30.997525+00:00",
   "started_at": "2026-11-06T01:01:15.145324+00:00",
-  "days_observed": 6.520314138090169,
-  "runs": 621,
-  "coverage": 99.04306220095694,
+  "days_observed": 6.530739030109512,
+  "runs": 622,
+  "coverage": 99.04458598726114,
   "recent_coverage": 93.75,
   "cash": 9981.39702327796,
   "equity": 9981.39702327796,
@@ -18,6 +18,46 @@
   "max_drawdown": 0.23994364662666134,
   "positions": [],
   "decisions": [
+    {
+      "slot": 1993879,
+      "at": "2026-11-12T13:45:30.997525+00:00",
+      "action": "HOLD",
+      "reason": "Entry blocked: Stale DexPaprika liquidity; missing/invalid analysis or liquidity data.",
+      "equity": 9981.39702327796,
+      "evidence": {
+        "price": 166.1,
+        "bid": 165.86,
+        "ask": 165.95,
+        "volume_24h": 20176.97682339,
+        "quote_fetched_at": 1794491124.693743,
+        "source": "CCXT MCP / Kraken QNT/USD",
+        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
+        "indicators": {
+          "1h": {
+            "sma20": 168.984,
+            "sma50": 176.0,
+            "rsi": 38.053097345132706,
+            "volatility": 1.232530658613505,
+            "volume_ratio": 0.37088006248923516,
+            "close": 165.38,
+            "candle_at": 1794484800.0
+          },
+          "4h": {
+            "sma20": 183.1825,
+            "sma50": 191.3388,
+            "rsi": 6.5082980800520716,
+            "volatility": 1.9269728037285823,
+            "volume_ratio": 0.4521668027924547,
+            "close": 165.46,
+            "candle_at": 1794470400.0
+          }
+        },
+        "bearish": true,
+        "eligible": false,
+        "reason": "Entry blocked: Stale DexPaprika liquidity; missing/invalid analysis or liquidity data.",
+        "strategy": "qnt-trend-v2"
+      }
+    },
     {
       "slot": 1993878,
       "at": "2026-11-12T13:30:30.286855+00:00",
@@ -1019,50 +1059,6 @@
         "eligible": true,
         "bullish": false,
         "reason": "1h RSI 24.3; 1h volatility 1.33%; volume 0.46x prior 20 bars; DEX liquidity $1,055,846. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
-        "strategy": "qnt-trend-v2"
-      }
-    },
-    {
-      "slot": 1993855,
-      "at": "2026-11-12T07:45:30.984605+00:00",
-      "action": "HOLD",
-      "reason": "1h RSI 14.8; 1h volatility 1.26%; volume 0.94x prior 20 bars; DEX liquidity $1,057,217. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
-      "equity": 9981.39702327796,
-      "evidence": {
-        "price": 164.48,
-        "bid": 164.44,
-        "ask": 164.56,
-        "volume_24h": 21151.3876799,
-        "quote_fetched_at": 1794469524.9073424,
-        "source": "CCXT MCP / Kraken QNT/USD",
-        "liquidity_source": "DexPaprika MCP / Ethereum QNT pool TVL",
-        "indicators": {
-          "1h": {
-            "sma20": 172.9265,
-            "sma50": 178.9674,
-            "rsi": 14.838957055214735,
-            "volatility": 1.2603188209731366,
-            "volume_ratio": 0.9449061869728519,
-            "close": 163.12,
-            "candle_at": 1794463200.0
-          },
-          "4h": {
-            "sma20": 186.2985,
-            "sma50": 192.3458,
-            "rsi": 5.785363031530224,
-            "volatility": 2.1063248545780264,
-            "volume_ratio": 1.2883698874318792,
-            "close": 165.72,
-            "candle_at": 1794441600.0
-          }
-        },
-        "bearish": true,
-        "liquidity_updated_at": 1794469440.0,
-        "liquidity_usd": 1057216.9570706044,
-        "volume_spike": false,
-        "eligible": true,
-        "bullish": false,
-        "reason": "1h RSI 14.8; 1h volatility 1.26%; volume 0.94x prior 20 bars; DEX liquidity $1,057,217. Entry trend/RSI criteria not met. Liquidity and spread gates passed.",
         "strategy": "qnt-trend-v2"
       }
     }
